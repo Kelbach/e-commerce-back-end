@@ -10,12 +10,17 @@ router.get('/', (req, res) => {
     attributes: [
       'id', 'product_name', 'price', 'stock'
     ],
-    order: [['created_at', 'DESC']],
     // be sure to include its associated Category and Tag data
     include: [
       {
         model: Category,
-        attributes: ['category_name']
+        attributes: ['id', 'category_name']
+      }, 
+      {
+        model: Tag,
+        attributes: ['tag_name'],
+        through: ProductTag,
+        as: 'product_tags'
       }
     ]
   })
@@ -45,7 +50,9 @@ router.get('/:id', (req, res) => {
       },
       {
         model: Tag,
-        attributes: ['tag_name']
+        attributes: ['tag_name'],
+        through: ProductTag,
+        as: 'product_tags'
       }
     ]
   })
@@ -66,10 +73,10 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   /* req.body should look like this...
     {
-      product_name: "Basketball",
-      price: 200.00,
-      stock: 3,
-      tagIds: [1, 2, 3, 4]
+      "product_name": "Basketball",
+      "price": 200.00,
+      "stock": 3,
+      "tagIds": [1, 2, 3, 4]
     }
   */
   Product.create(req.body)
